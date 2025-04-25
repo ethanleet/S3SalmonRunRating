@@ -1,7 +1,7 @@
 import pandas as pd
 
 # --- Configuration ---
-csv_file_path = 'rotation_data.csv'  # Replace with the actual path to your CSV file
+csv_file_path = 'data/rotations_raw.csv'
 header_option = None
 columns_to_use = [1, 2, 3, 4, 5]
 column_names = ['Stage', 'Weapon1', 'Weapon2', 'Weapon3', 'Weapon4']
