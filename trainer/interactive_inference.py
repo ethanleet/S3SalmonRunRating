@@ -5,10 +5,10 @@ import joblib
 
 try:
     # --- Load the necessary components ---
-    trained_model = joblib.load('data/weights.joblib')
-    stage_columns_from_training = joblib.load('data/columns/stage_columns.joblib')
-    weapon_columns_from_training = joblib.load('data/columns/weapon_columns.joblib')
-    all_training_columns = joblib.load('data/columns/all_training_columns.joblib')
+    trained_model = joblib.load('../data/weights.joblib')
+    stage_columns_from_training = joblib.load('../data/columns/stage_columns.joblib')
+    weapon_columns_from_training = joblib.load('../data/columns/weapon_columns.joblib')
+    all_training_columns = joblib.load('../data/columns/all_training_columns.joblib')
 
 except FileNotFoundError:
     print("Error: Model or column list files not found.")
