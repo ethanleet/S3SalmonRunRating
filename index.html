@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Salmon Run Difficulty Predictor</title>
+    <title>Splatoon 3 Salmon Run Rotation Rating</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <!-- Google tag (gtag.js) -->
@@ -17,15 +17,15 @@
 </script>
 <body>
     <header>
-        <h1>Splatoon 3 Salmon Run Difficulty Predictor (Alpha test) 🦑</h1>
+        <h1>Splatoon 3 Salmon Run Rotation Rating (Beta) 🦑</h1>
     </header>
 
     <main>
         <section id="selection-area">
-            <h2>Select Stage & Weapons</h2>
+            <h2>How good is this rotation?</h2>
 
             <div class="selection-group">
-                <label for="stage-select">Stage:</label>
+                <label for="stage-select">Select Stage:</label>
                 <div class="select-with-icon">
                     <img src="images/placeholder.png" alt="Stage Icon" id="stage-icon" class="icon">
                     <select id="stage-select">
@@ -33,45 +33,12 @@
                 </div>
             </div>
 
-            <div class="weapons-grid">
-                <div class="selection-group weapon-slot">
-                    <label for="weapon1-select">Weapon 1:</label>
-                    <div class="select-with-icon">
-                        <img src="images/placeholder.png" alt="Weapon 1 Icon" id="weapon1-icon" class="icon">
-                        <select id="weapon1-select" class="weapon-select">
-                            </select>
-                    </div>
-                </div>
-
-                <div class="selection-group weapon-slot">
-                    <label for="weapon2-select">Weapon 2:</label>
-                    <div class="select-with-icon">
-                        <img src="images/placeholder.png" alt="Weapon 2 Icon" id="weapon2-icon" class="icon">
-                        <select id="weapon2-select" class="weapon-select">
-                            </select>
-                    </div>
-                </div>
-
-                <div class="selection-group weapon-slot">
-                    <label for="weapon3-select">Weapon 3:</label>
-                    <div class="select-with-icon">
-                        <img src="images/placeholder.png" alt="Weapon 3 Icon" id="weapon3-icon" class="icon">
-                        <select id="weapon3-select" class="weapon-select">
-                            </select>
-                    </div>
-                </div>
-
-                <div class="selection-group weapon-slot">
-                    <label for="weapon4-select">Weapon 4:</label>
-                    <div class="select-with-icon">
-                        <img src="images/placeholder.png" alt="Weapon 4 Icon" id="weapon4-icon" class="icon">
-                        <select id="weapon4-select" class="weapon-select">
-                            </select>
-                    </div>
+            <div class="selection-group">
+                <label>Select 4 Weapons:</label>
+                <div id="weapon-checkbox-container">
                 </div>
             </div>
-
-            <p id="weapon-validation-message">*Weapon selections must be unique.</p>
+            
             <button id="confirm-button">Predict Difficulty</button>
         </section>
 
@@ -83,6 +50,14 @@
 
     <footer>
         <p>Splatoon 3 is a trademark of Nintendo. This site is not affiliated with Nintendo.</p>
+        <div class="footer-github-info">
+            <p>
+                Contribute to this project on <a href="https://github.com/ethanleet/s3-salmon-run" target="_blank" rel="noopener noreferrer">GitHub</a>.
+            </p>
+            <p>
+                Created by <a href="https://github.com/ethanleet" target="_blank" rel="noopener noreferrer">ethanleet</a>.
+            </p>
+        </div>
     </footer>
 
     <!-- import ONNXRuntime Web from CDN -->

@@ -81,24 +81,15 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- DOM Elements ---
     const stageSelect = document.getElementById('stage-select');
     const stageIcon = document.getElementById('stage-icon');
-    const weaponSelects = [
-        document.getElementById('weapon1-select'),
-        document.getElementById('weapon2-select'),
-        document.getElementById('weapon3-select'),
-        document.getElementById('weapon4-select')
-    ];
-    const weaponIcons = [
-        document.getElementById('weapon1-icon'),
-        document.getElementById('weapon2-icon'),
-        document.getElementById('weapon3-icon'),
-        document.getElementById('weapon4-icon')
-    ];
+    const weaponCheckboxContainer = document.getElementById('weapon-checkbox-container');
     const confirmButton = document.getElementById('confirm-button');
     const predictedRatingDisplay = document.getElementById('predicted-rating');
 
     // --- ONNX Model Variables ---
     let onnxSession = null;
     const onnxModelPath = 'data/model.onnx';
+    
+    let selectedWeapons = new Set();
 
 
     function updateIcon(selectElement, iconElement) {
@@ -108,32 +99,17 @@ document.addEventListener('DOMContentLoaded', () => {
         iconElement.alt = selectedOption ? selectedOption.textContent + " icon" : "Icon";
     }
 
-    function isWeaponSelectionValid() {
-        const selectedWeaponIds = weaponSelects.map(select => select.value);
-        const uniqueWeaponIds = new Set(selectedWeaponIds);
-        if (uniqueWeaponIds.has('wildcard')) {
-            return false;
-        }
-        return uniqueWeaponIds.size === selectedWeaponIds.length;
-    }
-
     function updateConfirmButtonState() {
         if (!onnxSession) {
             confirmButton.disabled = true;
             return;
         }
-        confirmButton.disabled = !isWeaponSelectionValid();
+        confirmButton.disabled = selectedWeapons.size !== 4;
     }
 
     stageSelect.addEventListener('change', () => updateIcon(stageSelect, stageIcon));
-    weaponSelects.forEach((select, index) => {
-        select.addEventListener('change', () => {
-            updateIcon(select, weaponIcons[index]);
-            updateConfirmButtonState();
-        });
-    });
 
-    function populateDropdowns() {
+    function populateStageDropdown() {
         stages.forEach(stage => {
             const option = document.createElement('option');
             option.value = stage.id;
@@ -141,23 +117,67 @@ document.addEventListener('DOMContentLoaded', () => {
             option.dataset.icon = stage.icon;
             stageSelect.appendChild(option);
         });
+    }
 
-        weaponSelects.forEach(select => {
-            weapons.forEach(weapon => {
-                if (weapon.id === 'wildcard') return;
-                const option = document.createElement('option');
-                option.value = weapon.id;
-                option.textContent = weapon.name;
-                option.dataset.icon = weapon.icon;
-                select.appendChild(option);
+    function handleWeaponSelection(event) {
+        const weaponEl = event.currentTarget;
+        const weaponId = weaponEl.dataset.weaponId;
+        
+        if (selectedWeapons.has(weaponId)) {
+            selectedWeapons.delete(weaponId);
+            weaponEl.classList.remove('selected');
+            weaponEl.setAttribute('aria-checked', 'false');
+        } else {
+            if (selectedWeapons.size < 4) {
+                selectedWeapons.add(weaponId);
+                weaponEl.classList.add('selected');
+                weaponEl.setAttribute('aria-checked', 'true');
+            } else {
+                alert("You can only select up to 4 weapons. Please deselect one if you wish to choose another.");
+            }
+        }
+        updateConfirmButtonState();
+    }
+
+    function populateWeaponCheckboxes() {
+        weaponCheckboxContainer.innerHTML = '';
+        weapons.forEach(weapon => {
+            if (weapon.id === 'wildcard') return; // Skip wildcard
+            
+            const weaponEl = document.createElement('div');
+            weaponEl.classList.add('weapon-checkbox-item');
+            weaponEl.dataset.weaponId = weapon.id;
+            weaponEl.setAttribute('role', 'checkbox');
+            weaponEl.setAttribute('aria-checked', 'false');
+            weaponEl.tabIndex = 0; // Make it focusable
+            
+            const img = document.createElement('img');
+            img.src = weapon.icon || defaultIcon;
+            img.alt = weapon.name;
+            img.classList.add('weapon-item-icon');
+            
+            const nameSpan = document.createElement('span');
+            nameSpan.textContent = weapon.name;
+            nameSpan.classList.add('weapon-item-name');
+            
+            weaponEl.appendChild(img);
+            weaponEl.appendChild(nameSpan);
+            
+            weaponEl.addEventListener('click', handleWeaponSelection);
+            weaponEl.addEventListener('keydown', (e) => {
+                if (e.key === ' ' || e.key === 'Enter') {
+                    e.preventDefault();
+                    handleWeaponSelection(e);
+                }
             });
+            weaponCheckboxContainer.appendChild(weaponEl);
         });
     }
 
     function initializeSelectionsAndIcons() {
-        populateDropdowns();
+        populateStageDropdown();
         updateIcon(stageSelect, stageIcon);
-        weaponSelects.forEach((select, index) => updateIcon(select, weaponIcons[index]));
+        populateWeaponCheckboxes();
     }
 
     initializeSelectionsAndIcons();
@@ -200,7 +220,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const selectedStageId = stageSelect.value;
-        const selectedWeaponIds = weaponSelects.map(select => select.value);
+        const selectedWeaponIds = Array.from(selectedWeapons);
 
         const features = convertSelectionsToFeatures(selectedStageId, selectedWeaponIds);
         if (!features) {
