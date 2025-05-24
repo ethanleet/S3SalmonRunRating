@@ -78,25 +78,5 @@
     <!-- import ONNXRuntime Web from CDN -->
     <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/ort.min.js"></script>
     <script src="script.js" defer></script>
-    <script>
-        // use an async context to call onnxruntime functions.
-        async function main() {
-            try {
-                // create a new session and load the specific model.
-                //
-                // the model in this example contains a single MatMul node
-                // it has 2 inputs: 'a'(float32, 3x4) and 'b'(float32, 4x3)
-                // it has 1 output: 'c'(float32, 3x3)
-                const session = await ort.InferenceSession.create('data/model.onnx');
-                
-
-                
-            } catch (e) {
-                document.write(`failed to inference ONNX model: ${e}.`);
-            }
-        }
-        
-        main();
-    </script>
 </body>
 </html>
