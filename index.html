@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Salmon Run Difficulty Predictor</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Splatoon 3 Salmon Run Difficulty Predictor (Alpha test) 🦑</h1>
+    </header>
+
+    <main>
+        <section id="selection-area">
+            <h2>Select Stage & Weapons</h2>
+
+            <div class="selection-group">
+                <label for="stage-select">Stage:</label>
+                <div class="select-with-icon">
+                    <img src="placeholder.png" alt="Stage Icon" id="stage-icon" class="icon">
+                    <select id="stage-select">
+                        </select>
+                </div>
+            </div>
+
+            <div class="weapons-grid">
+                <div class="selection-group weapon-slot">
+                    <label for="weapon1-select">Weapon 1:</label>
+                    <div class="select-with-icon">
+                        <img src="placeholder.png" alt="Weapon 1 Icon" id="weapon1-icon" class="icon">
+                        <select id="weapon1-select" class="weapon-select">
+                            </select>
+                    </div>
+                </div>
+
+                <div class="selection-group weapon-slot">
+                    <label for="weapon2-select">Weapon 2:</label>
+                    <div class="select-with-icon">
+                        <img src="placeholder.png" alt="Weapon 2 Icon" id="weapon2-icon" class="icon">
+                        <select id="weapon2-select" class="weapon-select">
+                            </select>
+                    </div>
+                </div>
+
+                <div class="selection-group weapon-slot">
+                    <label for="weapon3-select">Weapon 3:</label>
+                    <div class="select-with-icon">
+                        <img src="placeholder.png" alt="Weapon 3 Icon" id="weapon3-icon" class="icon">
+                        <select id="weapon3-select" class="weapon-select">
+                            </select>
+                    </div>
+                </div>
+
+                <div class="selection-group weapon-slot">
+                    <label for="weapon4-select">Weapon 4:</label>
+                    <div class="select-with-icon">
+                        <img src="placeholder.png" alt="Weapon 4 Icon" id="weapon4-icon" class="icon">
+                        <select id="weapon4-select" class="weapon-select">
+                            </select>
+                    </div>
+                </div>
+            </div>
+
+            <button id="confirm-button">Predict Difficulty</button>
+        </section>
+
+        <section id="results-area">
+            <h2>Predicted Rating</h2>
+            <p id="predicted-rating">-</p>
+        </section>
+    </main>
+
+    <footer>
+        <p>Splatoon 3 is a trademark of Nintendo. This site is not affiliated with Nintendo.</p>
+    </footer>
+
+    <!-- import ONNXRuntime Web from CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/ort.min.js"></script>
+    <script src="script.js" defer></script>
+    <script>
+        // use an async context to call onnxruntime functions.
+        async function main() {
+            try {
+                // create a new session and load the specific model.
+                //
+                // the model in this example contains a single MatMul node
+                // it has 2 inputs: 'a'(float32, 3x4) and 'b'(float32, 4x3)
+                // it has 1 output: 'c'(float32, 3x3)
+                const session = await ort.InferenceSession.create('data/model.onnx');
+                
+
+                
+            } catch (e) {
+                document.write(`failed to inference ONNX model: ${e}.`);
+            }
+        }
+        
+        main();
+    </script>
+</body>
+</html>
