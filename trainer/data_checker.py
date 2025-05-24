@@ -1,7 +1,11 @@
 import pandas as pd
 
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+
 # --- Configuration ---
-csv_file_path = 'data/rotations_raw.csv'
+csv_file_path = BASE_DIR / 'data/rotations_raw.csv'
 header_option = None
 columns_to_use = [1, 2, 3, 4, 5]
 column_names = ['Stage', 'Weapon1', 'Weapon2', 'Weapon3', 'Weapon4']

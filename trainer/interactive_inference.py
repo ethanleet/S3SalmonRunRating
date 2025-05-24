@@ -2,13 +2,16 @@ import pandas as pd
 import numpy as np
 import joblib
 
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 try:
     # --- Load the necessary components ---
-    trained_model = joblib.load('../data/weights.joblib')
-    stage_columns_from_training = joblib.load('../data/columns/stage_columns.joblib')
-    weapon_columns_from_training = joblib.load('../data/columns/weapon_columns.joblib')
-    all_training_columns = joblib.load('../data/columns/all_training_columns.joblib')
+    trained_model = joblib.load(BASE_DIR / 'data/weights.joblib')
+    stage_columns_from_training = joblib.load(BASE_DIR / 'data/columns/stage_columns.joblib')
+    weapon_columns_from_training = joblib.load(BASE_DIR / 'data/columns/weapon_columns.joblib')
+    all_training_columns = joblib.load(BASE_DIR / 'data/columns/all_training_columns.joblib')
 
 except FileNotFoundError:
     print("Error: Model or column list files not found.")

@@ -8,8 +8,9 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 from sklearn.model_selection import train_test_split
 
-# --- 1. Load Data ---
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# --- 1. Load Data ---
 df = pd.read_csv(BASE_DIR / 'data/rotations_raw.csv', usecols=[1, 2, 3, 4, 5, 6])
 column_names = ['Stage', 'Weapon1', 'Weapon2', 'Weapon3', 'Weapon4', 'Rating']
 df.columns = column_names
@@ -97,7 +98,7 @@ print(f"Number of features for ONNX model: {num_features}")
 initial_type = [('float_input', FloatTensorType([None, num_features]))]
 onnx_model_filename = BASE_DIR / 'data/model.onnx'
 try:
-	onnx_model = convert_sklearn(model, initial_types=initial_type, target_opset=12)
+	onnx_model = convert_sklearn(model, initial_types=initial_type)
 	with open(onnx_model_filename, "wb") as f:
 		f.write(onnx_model.SerializeToString())
 	print(f"Model saved successfully to {onnx_model_filename}")
