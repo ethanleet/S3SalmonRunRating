@@ -99,7 +99,7 @@ select {
 
 @media (min-width: 1024px) {
     #weapon-checkbox-container {
-        grid-template-columns: repeat(8, 1fr);
+        grid-template-columns: repeat(6, 1fr);
     }
 }
 
