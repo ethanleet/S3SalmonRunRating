@@ -193,7 +193,13 @@ button:disabled {
     padding: 15px;
     background-color: #e9f2f9;
     border-radius: 5px;
-    display: inline-block;
+    display: inline-flex;
+    width: 180px;
+    height: 120px;
+    box-sizing: border-box;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
 }
 
 footer {
@@ -202,4 +208,26 @@ footer {
     background: #35424a;
     color: #ffffff;
     font-size: 0.8em;
+}
+
+.footer-github-info {
+    margin-top: 15px;
+    padding-top: 10px;
+    border-top: 1px solid #5a6268; 
+}
+
+.footer-github-info p {
+    margin: 5px 0;
+    line-height: 1.4;
+}
+
+.footer-github-info a {
+    color: #a9d1f8;
+    text-decoration: underline;
+    transition: color 0.2s ease; /* Smooth color transition on hover */
+}
+
+.footer-github-info a:hover {
+    color: #ffffff; /* Link becomes white on hover */
+    text-decoration: none; /* Remove underline on hover */
 }
