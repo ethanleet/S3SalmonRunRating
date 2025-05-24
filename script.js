@@ -108,9 +108,29 @@ document.addEventListener('DOMContentLoaded', () => {
         iconElement.alt = selectedOption ? selectedOption.textContent + " icon" : "Icon";
     }
 
+    function isWeaponSelectionValid() {
+        const selectedWeaponIds = weaponSelects.map(select => select.value);
+        const uniqueWeaponIds = new Set(selectedWeaponIds);
+        if (uniqueWeaponIds.has('wildcard')) {
+            return false;
+        }
+        return uniqueWeaponIds.size === selectedWeaponIds.length;
+    }
+
+    function updateConfirmButtonState() {
+        if (!onnxSession) {
+            confirmButton.disabled = true;
+            return;
+        }
+        confirmButton.disabled = !isWeaponSelectionValid();
+    }
+
     stageSelect.addEventListener('change', () => updateIcon(stageSelect, stageIcon));
     weaponSelects.forEach((select, index) => {
-        select.addEventListener('change', () => updateIcon(select, weaponIcons[index]));
+        select.addEventListener('change', () => {
+            updateIcon(select, weaponIcons[index]);
+            updateConfirmButtonState();
+        });
     });
 
     function populateDropdowns() {
@@ -144,7 +164,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function convertSelectionsToFeatures(stageId, weaponIds) {
         const features = [];
-        const numExpectedFeatures = 71;
+        const numExpectedFeatures = stages.length + weapons.length;
 
         // One-hot encode stage
         const stageIndex = stages.findIndex(s => s.id === stageId);
@@ -197,6 +217,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             console.log("ONNX Results:", results);
 
+            let rating;
             const outputKey = onnxSession.outputNames[0];
             if (results[outputKey] && results[outputKey].data) {
                 rating = results[outputKey].data[0];
@@ -238,6 +259,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log("ONNX Model loaded successfully.");
             document.getElementById('confirm-button').disabled = false;
             document.getElementById('confirm-button').textContent = "Predict Difficulty";
+            updateConfirmButtonState();
             return onnxSession;
         } catch (e) {
             console.error("Failed to load ONNX model:", e);
