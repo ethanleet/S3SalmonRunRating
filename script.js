@@ -124,6 +124,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         weaponSelects.forEach(select => {
             weapons.forEach(weapon => {
+                if (weapon.id === 'wildcard') return;
                 const option = document.createElement('option');
                 option.value = weapon.id;
                 option.textContent = weapon.name;
