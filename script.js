@@ -1,5 +1,7 @@
 // --- Define global assets ---
 let gameDefinitions = {};
+let translations = {};
+let currentLanguage = 'en';
 
 async function loadGameDefinitions() {
     try {
@@ -9,7 +11,27 @@ async function loadGameDefinitions() {
         console.log("Game definitions loaded:", gameDefinitions);
     } catch (error) {
         console.error("Could not load game definitions:", error);
-        throw error; // Re-throw to stop further execution if critical
+        throw error; // Re-throw critical error
+    }
+}
+
+async function loadTranslations(lang = 'en') {
+    try {
+        const response = await fetch(`locales/${lang}.json`);
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        translations = await response.json();
+        currentLanguage = lang;
+        console.log(`Translations for ${lang} loaded:`, translations);
+        // Store user's language preference
+        localStorage.setItem('preferredLanguage', lang);
+    } catch (error) {
+        console.error(`Could not load translations for ${lang}:`, error);
+        if (lang !== 'en') {
+            console.warn("Falling back to English translations.");
+            await loadTranslations('en'); // Recursive call, ensure base 'en.json' exists
+        } else {
+            throw error; // Re-throw critical error
+        }
     }
 }
 
@@ -30,11 +52,41 @@ function initializeAppUI() {
     let selectedWeapons = new Set();
 
 
+    function applyAllUIText() {
+        if (!translations.ui) {
+            console.error("UI translations not loaded.");
+            return;
+        }
+        document.title = translations.ui.pageTitle;
+        document.querySelector('header h1').textContent = translations.ui.headerTitle;
+        document.querySelector('section#selection-area h2').textContent = translations.ui.selectStageWeaponsTitle;
+        document.querySelector('label[for="stage-select"]').textContent = translations.ui.stageLabel;
+        document.querySelector('label[for="weapon-checkbox-container"]').textContent = translations.ui.select4WeaponsLabel;
+        confirmButton.textContent = translations.ui.predictButton;
+        document.querySelector('section#results-area h2').textContent = translations.ui.predictedRatingTitle;
+
+        // Footer text
+        const footer = document.querySelector('footer');
+        const footerDisclaimer = footer.querySelector('p:first-child');
+        if (footerDisclaimer) footerDisclaimer.textContent = translations.ui.footerDisclaimer;
+    }
+
     function updateIcon(selectElement, iconElement) {
         const selectedOption = selectElement.options[selectElement.selectedIndex];
         const iconPath = selectedOption && selectedOption.dataset.icon ? selectedOption.dataset.icon : defaultIcon;
         iconElement.src = iconPath;
         iconElement.alt = selectedOption ? selectedOption.textContent + " icon" : "Icon";
+    }
+
+    function populateStageDropdown() {
+        gameDefinitions.stages.forEach(stage => {
+            const option = document.createElement('option');
+            option.value = stage.id;
+            option.textContent = translations.stageNames[stage.id] || stage.id;
+            option.dataset.icon = stage.icon;
+            stageSelect.appendChild(option);
+        });
+        updateIcon(stageSelect, stageIcon);
     }
 
     function updateConfirmButtonState() {
@@ -43,18 +95,6 @@ function initializeAppUI() {
             return;
         }
         confirmButton.disabled = selectedWeapons.size !== 4;
-    }
-
-    stageSelect.addEventListener('change', () => updateIcon(stageSelect, stageIcon));
-
-    function populateStageDropdown() {
-        gameDefinitions.stages.forEach(stage => {
-            const option = document.createElement('option');
-            option.value = stage.id;
-            option.textContent = stage.name;
-            option.dataset.icon = stage.icon;
-            stageSelect.appendChild(option);
-        });
     }
 
     function handleWeaponSelection(event) {
@@ -71,7 +111,7 @@ function initializeAppUI() {
                 weaponEl.classList.add('selected');
                 weaponEl.setAttribute('aria-checked', 'true');
             } else {
-                alert("You can only select up to 4 weapons. Please deselect one if you wish to choose another.");
+                alert(translations.ui.maxWeaponsAlert);
             }
         }
         updateConfirmButtonState();
@@ -91,11 +131,11 @@ function initializeAppUI() {
             
             const img = document.createElement('img');
             img.src = weapon.icon || defaultIcon;
-            img.alt = weapon.name;
+            img.alt = translations.weaponNames[weapon.id] || weapon.id;
             img.classList.add('weapon-item-icon');
             
             const nameSpan = document.createElement('span');
-            nameSpan.textContent = weapon.name;
+            nameSpan.textContent = translations.weaponNames[weapon.id] || weapon.id;
             nameSpan.classList.add('weapon-item-name');
             
             weaponEl.appendChild(img);
@@ -112,8 +152,9 @@ function initializeAppUI() {
         });
     }
 
+    applyAllUIText();
+    stageSelect.addEventListener('change', () => updateIcon(stageSelect, stageIcon));
     populateStageDropdown();
-    updateIcon(stageSelect, stageIcon);
     populateWeaponCheckboxes();
 
     function convertSelectionsToFeatures(stageId, weaponIds) {
@@ -148,7 +189,7 @@ function initializeAppUI() {
 
     confirmButton.addEventListener('click', async () => {
         if (!onnxSession) {
-            predictedRatingDisplay.textContent = "Model not loaded yet. Please wait or refresh.";
+            predictedRatingDisplay.textContent = translations.ui.modelNotLoadedError;
             console.warn("Prediction attempted before ONNX session was ready.");
             return;
         }
@@ -158,7 +199,7 @@ function initializeAppUI() {
 
         const features = convertSelectionsToFeatures(selectedStageId, selectedWeaponIds);
         if (!features) {
-            predictedRatingDisplay.textContent = "Error preparing input data for the model.";
+            predictedRatingDisplay.textContent = translations.ui.errorPreparingData;
             return;
         }
 
@@ -187,16 +228,16 @@ function initializeAppUI() {
                     console.warn(`Used fallback output key: ${fallbackOutputKey}`);
                 } else {
                     console.error("Could not determine or access output tensor in ONNX results:", results);
-                    predictedRatingDisplay.textContent = "Error: Prediction output format unknown.";
+                    predictedRatingDisplay.textContent = translations.ui.errorOutputFormatUnknown;
                     return;
                 }
             }
 
             console.log("Parsed rating without roundoff:", rating);
-            predictedRatingDisplay.textContent = `${parseFloat(rating).toFixed(1)}`;
+            predictedRatingDisplay.textContent = `${parseFloat(rating).toFixed(1)} / 10`;
         } catch (e) {
             console.error("Error during ONNX inference:", e);
-            predictedRatingDisplay.textContent = "Error: Prediction failed.";
+            predictedRatingDisplay.textContent = translations.ui.errorPredictionFailed;
         }
 
         // Scroll to results
@@ -212,27 +253,30 @@ function initializeAppUI() {
             onnxSession = await ort.InferenceSession.create(onnxModelPath);
             console.log("ONNX Model loaded successfully.");
             document.getElementById('confirm-button').disabled = false;
-            document.getElementById('confirm-button').textContent = "Predict Difficulty";
+            document.getElementById('confirm-button').textContent = translations.ui.predictButton;
             updateConfirmButtonState();
             return onnxSession;
         } catch (e) {
             console.error("Failed to load ONNX model:", e);
-            predictedRatingDisplay.textContent = "Error: Could not load model.";
-            document.getElementById('confirm-button').textContent = "Model Load Failed";
+            predictedRatingDisplay.textContent = translations.ui.errorModelLoad;
+            document.getElementById('confirm-button').textContent = translations.ui.predictButtonFailure;
             return null;
         }
     }
 
     // --- INITIAL PAGE SETUP ---
     confirmButton.disabled = true;
-    confirmButton.textContent = "Loading Model...";
+    confirmButton.textContent = translations.ui.predictButtonLoading;
 
     loadOnnxModel();
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
+    currentLanguage = localStorage.getItem('preferredLanguage') || 'en';
+
     try {
         await loadGameDefinitions();
+        await loadTranslations(currentLanguage);
         
         initializeAppUI();
         
