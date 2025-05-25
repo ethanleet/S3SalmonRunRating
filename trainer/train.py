@@ -12,7 +12,7 @@ from sklearn.model_selection import RandomizedSearchCV, train_test_split
 from scipy.stats import randint
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-RANDOM_STATE = 6
+RANDOM_STATE = 42
 
 # --- 1. Load Data ---
 df = pd.read_csv(BASE_DIR / 'data/rotations_raw.csv', usecols=[1, 2, 3, 4, 5, 6])
@@ -80,21 +80,22 @@ print(f"Shape of X_processed: {X_processed.shape}")
 print(f"Shape of y: {y.shape}")
 
 # --- 5. Start training ---
-X_train, X_test, y_train, y_test = train_test_split(X_processed, y, test_size=0.1, random_state=RANDOM_STATE)
+
+# Step 5a: Split training and testing set
+X_train, X_test, y_train, y_test = train_test_split(X_processed, y, test_size=0.2, random_state=RANDOM_STATE)
 joblib.dump(X_train.columns.tolist(), BASE_DIR / 'data/columns/all_training_columns.joblib')
 
-# Define the parameter distribution for RandomizedSearchCV
+# Step 5b: Define the parameter distribution for RandomizedSearchCV
 param_dist = {
-	'n_estimators': randint(100, 500),
-	'max_depth': randint(3, 10),
+	'max_depth': randint(10, 30),
 	'min_samples_split': randint(5, 25),
-	'min_samples_leaf': randint(3, 15),
-	'max_features': ['sqrt', 'log2', 0.5, 0.7, None]
+	'min_samples_leaf': randint(3, 20),
+	'max_features': ['sqrt', 'log2', 0.5]
 }
 
-# Initialize the RandomizedSearchCV object
+# Step 5c: Initialize the RandomizedSearchCV object
 random_search = RandomizedSearchCV(
-	estimator=RandomForestRegressor(oob_score=False), # oob_score not typically used with CV
+	estimator=RandomForestRegressor(n_estimators=500, oob_score=False), # oob_score not typically used with CV
 	param_distributions=param_dist,
 	n_iter=1000,
 	cv=5,
@@ -114,7 +115,7 @@ best_model = random_search.best_estimator_
 
 # Step 6a: Create checkpoint directory
 timestamp = datetime.now().isoformat().replace(':', '-')
-checkpoint_dir = BASE_DIR / "data" / timestamp;
+checkpoint_dir = BASE_DIR / "data/checkpoints" / timestamp;
 try:
 	os.mkdir(checkpoint_dir)
 	print(f"Directory '{checkpoint_dir}' created successfully.")
@@ -124,13 +125,13 @@ except PermissionError:
 	print(f"Permission denied: Unable to create '{checkpoint_dir}'.")
 except Exception as e:
 	print(f"An error occurred: {e}")
-# Step 6a: Dump using joblib for Python interactive inference
+# Step 6b: Dump using joblib for Python interactive inference
 model_filename = checkpoint_dir / 'weights.joblib'
 print(f"Saving model to {model_filename}...")
 joblib.dump(best_model, model_filename)
 print("Model saved successfully.")
 
-# Step 6b: Convert to ONNX for JavaScript consumption on the front end
+# Step 6c: Convert to ONNX for JavaScript consumption on the front end
 num_features = X_train.shape[1]
 print(f"Number of features for ONNX model: {num_features}")
 initial_type = [('float_input', FloatTensorType([None, num_features]))]
@@ -146,21 +147,53 @@ except Exception as e:
 	print("Check supported models: https://onnx.ai/sklearn-onnx/supported.html")
 	print("Double-check that `num_features` accurately reflects your model's input.")
 
-# --- 7. Make predictions, evaluate, etc. ---
-y_pred_raw = best_model.predict(X_test)
-y_pred = (y_pred_raw * 2).round() / 2
-print("--- Evaluating Raw Predictions ---")
-mae_raw = mean_absolute_error(y_test, y_pred_raw)
-rmse_raw = mean_squared_error(y_test, y_pred_raw, squared=False) # RMSE
-r2_raw = r2_score(y_test, y_pred_raw)
-mae_output = f"Mean Absolute Error (MAE): {mae_raw:.4f}"
-rmse_output = f"Root Mean Squared Error (RMSE): {rmse_raw:.4f}"
-r2_output  = f"R-squared (R2 Score): {r2_raw:.4f}"
-print(mae_output)
-print(rmse_output)
-print(r2_output)
+# --- 7. Model evaluation ---
+def evaluate_model_performance(model, X_data, y_true, dataset_name):
+	"""
+	Evaluates the model on the given data and returns a dictionary of metrics.
+	Also prints the metrics.
+	"""
+	print(f"\n--- Evaluating on {dataset_name} ---")
 
-metadata_filename = checkpoint_dir / 'metadata.txt';
+	y_pred_raw = model.predict(X_data)
+	mae_raw = mean_absolute_error(y_true, y_pred_raw)
+	rmse_raw = mean_squared_error(y_true, y_pred_raw, squared=False)
+	r2_raw = r2_score(y_true, y_pred_raw)
+	mae_raw_output = f"Mean Absolute Error (MAE): {mae_raw:.4f}"
+	rmse_raw_output = f"Root Mean Squared Error (RMSE): {rmse_raw:.4f}"
+	r2_raw_output = f"R-squared (R2 Score): {r2_raw:.4f}"
+	print(mae_raw_output)
+	print(rmse_raw_output)
+	print(r2_raw_output)
+
+	metrics = {
+		"mae": mae_raw,
+		"rmse": rmse_raw,
+		"r2": r2_raw,
+		"mae_output": mae_raw_output,
+		"rmse_output": rmse_raw_output,
+		"r2_output": r2_raw_output,
+	}
+	return metrics
+
+train_metrics = evaluate_model_performance(best_model, X_train, y_train, "Train Set")
+test_metrics = evaluate_model_performance(best_model, X_test, y_test, "Test Set")
+
+# --- 8. Saving Hyperparameters and Evaluation Metrics to Metadata File ---
+metadata_filename = checkpoint_dir / 'metadata.txt'
+print(f"\nSaving metadata to {metadata_filename}...")
 with open(metadata_filename, "w") as f:
-	f.write(mae_output + '\n' + rmse_output + '\n' + r2_output + '\n')
+	f.write("--- Best Hyperparameters ---\n")
+	f.write(str(random_search.best_params_) + '\n\n')
+
+	f.write("--- Train Set Evaluation ---\n")
+	f.write(train_metrics["mae_output"] + '\n')
+	f.write(train_metrics["rmse_output"] + '\n')
+	f.write(train_metrics["r2_output"] + '\n\n')
+
+	f.write("--- Test Set Evaluation ---\n")
+	f.write(test_metrics["mae_output"] + '\n')
+	f.write(test_metrics["rmse_output"] + '\n')
+	f.write(test_metrics["r2_output"] + '\n\n')
+
 print(f"Metadata saved successfully to {metadata_filename}")
