@@ -13,13 +13,55 @@ body {
 header {
     background: #35424a;
     color: #ffffff;
-    padding: 1rem 0;
+    padding: 1rem 20px; /* Keeps horizontal padding for switcher spacing from edge */
     text-align: center;
+    position: relative; /* Establishes a positioning context for the absolute switcher */
 }
 
 header h1 {
-    margin: 0;
-    font-size: 2em;
+    margin: 0 auto; /* Centers the h1 if it's a block with a defined width or max-width */
+    display: inline-block; /* Allows text-align:center on parent to center it */
+    font-size: 1.8em;
+    line-height: 1.4; /* Adjust for good vertical spacing within the header's padding */
+    vertical-align: middle; /* Helps align with other potential inline-block elements or the switcher's perceived middle */
+}
+
+.language-switcher-container {
+    position: absolute; /* Take switcher out of normal flow */
+    right: 20px;        /* Position 20px from the right edge of the header */
+    top: 50%;           /* Position its top at the vertical midpoint of the header */
+    transform: translateY(-50%); /* Shift it up by half of its own height to truly center it vertically */
+
+    /* Styles for its internal content (label + select) */
+    display: flex;
+    align-items: center; /* Vertically align label and select within this container */
+}
+
+.language-switcher-container label {
+    margin-right: 6px; /* Space between label and select */
+    font-size: 0.75em;  /* Smaller font size for the label */
+    font-weight: normal; /* Less emphasis */
+    color: #e0e0e0;    /* Light color to be visible on the dark header */
+    flex-shrink: 0; /* Prevent the label from shrinking if space is tight */
+}
+
+#language-switcher {
+    padding: 3px 5px;     /* Reduced padding to make it smaller */
+    font-size: 0.75em;    /* Smaller font size for the select box */
+    border-radius: 3px;   /* Slightly smaller border radius */
+    border: 1px solid #6c757d; /* A border that works on dark backgrounds */
+    background-color: #495057; /* A darker background for the select element */
+    color: #ffffff;       /* White text for the selected option */
+    cursor: pointer;
+    flex-grow: 1; /* Allows the select to expand within the container's fixed width */
+    width: auto;
+    min-width: 70px;
+}
+
+/* Styling the <option> elements when the dropdown is open */
+#language-switcher option {
+    background-color: #ffffff; /* Light background for the options themselves */
+    color: #333333;       /* Dark text for the options */
 }
 
 main {
