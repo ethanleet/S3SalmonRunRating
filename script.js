@@ -161,6 +161,7 @@ function initializeAppUI() {
 
     function populateWeaponCheckboxes() {
         weaponCheckboxContainer.innerHTML = '';
+        selectedWeapons.clear();
         gameDefinitions.weapons.forEach(weapon => {
             if (weapon.id === 'wildcard') return;
             
