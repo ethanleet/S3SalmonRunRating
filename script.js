@@ -2,6 +2,10 @@
 let gameDefinitions = {};
 let translations = {};
 let currentLanguage = 'en';
+const supportedLanguages = [
+    { code: 'en', name: 'English' },
+    { code: 'ja', name: '日本語' },
+];
 
 async function loadGameDefinitions() {
     try {
@@ -37,6 +41,7 @@ async function loadTranslations(lang = 'en') {
 
 function initializeAppUI() {
     // --- DOM Elements ---
+    const languageSwitcher = document.getElementById('language-switcher');
     const stageSelect = document.getElementById('stage-select');
     const stageIcon = document.getElementById('stage-icon');
     const weaponCheckboxContainer = document.getElementById('weapon-checkbox-container');
@@ -69,6 +74,42 @@ function initializeAppUI() {
         const footer = document.querySelector('footer');
         const footerDisclaimer = footer.querySelector('p:first-child');
         if (footerDisclaimer) footerDisclaimer.textContent = translations.ui.footerDisclaimer;
+
+        populateStageDropdown();
+        populateWeaponCheckboxes();
+    }
+
+    async function handleLanguageChange(event) {
+        const newLangCode = event.target.value;
+        if (newLangCode === currentLanguage) return;
+        try {
+            await loadTranslations(newLangCode);
+            localStorage.setItem('preferredLanguage', newLangCode);
+
+            applyAllUIText();
+            document.getElementById('language-switcher').value = currentLanguage;
+        } catch (error) {
+            console.error("Error switching language:", error);
+        }
+    }
+
+    function populateLanguageSwitcher() {
+        const switcher = document.getElementById('language-switcher');
+        if (!switcher) {
+            console.warn("Language switcher element not found.");
+            return;
+        }
+
+        switcher.innerHTML = ''; // Clear any existing options
+
+        supportedLanguages.forEach(lang => {
+            const option = document.createElement('option');
+            option.value = lang.code;
+            option.textContent = lang.name;
+            switcher.appendChild(option);
+        });
+
+        switcher.value = currentLanguage;
     }
 
     function updateIcon(selectElement, iconElement) {
@@ -79,6 +120,7 @@ function initializeAppUI() {
     }
 
     function populateStageDropdown() {
+        stageSelect.innerHTML = '';
         gameDefinitions.stages.forEach(stage => {
             const option = document.createElement('option');
             option.value = stage.id;
@@ -152,10 +194,12 @@ function initializeAppUI() {
         });
     }
 
-    applyAllUIText();
+    languageSwitcher.addEventListener('change', handleLanguageChange);
     stageSelect.addEventListener('change', () => updateIcon(stageSelect, stageIcon));
-    populateStageDropdown();
-    populateWeaponCheckboxes();
+
+    populateLanguageSwitcher();
+    applyAllUIText();
+    
 
     function convertSelectionsToFeatures(stageId, weaponIds) {
         const features = [];
