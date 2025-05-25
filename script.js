@@ -1,83 +1,19 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const stages = [
-        { id: "spawning_grounds", name: "Spawning Grounds", icon: "images/stages/64px-S3_Badge_Spawning_Grounds_200.png" },
-        { id: "sockeye_station", name: "Sockeye Station", icon: "images/stages/64px-S3_Badge_Sockeye_Station_200.png" },
-        { id: "salmonid_smokeyard", name: "Salmonid Smokeyard", icon: "images/stages/64px-S3_Badge_Salmonid_Smokeyard_200.png" },
-        { id: "marooners_bay", name: "Marooner's Bay", icon: "images/stages/64px-S3_Badge_Marooner's_Bay_200.png" },
-        { id: "gone_fission_hydroplant", name: "Gone Fission Hydroplant", icon: "images/stages/64px-S3_Badge_Gone_Fission_Hydroplant_200.png" },
-        { id: "jammin_salmon_junction", name: "Jammin' Salmon Junction", icon: "images/stages/64px-S3_Badge_Jammin'_Salmon_Junction_200.png" },
-        { id: "bonerattle_arena", name: "Bonerattle Arena", icon: "images/stages/64px-S3_Badge_Bonerattle_Arena_200.png" },
-    ];
+// --- Define global assets ---
+let gameDefinitions = {};
 
-    const weapons = [
-        { id: "sploosh_o_matic", name: "Sploosh-o-matic", icon: "images/weapons/64px-S3_Badge_Sploosh-o-matic_4.png" },
-        { id: "splattershot_jr", name: "Splattershot Jr.", icon: "images/weapons/64px-S3_Badge_Splattershot_Jr._4.png" },
-        { id: "splash_o_matic", name: "Splash-o-matic", icon: "images/weapons/64px-S3_Badge_Splash-o-matic_4.png" },
-        { id: "aerospray_mg", name: "Aerospray MG", icon: "images/weapons/64px-S3_Badge_Aerospray_MG_4.png" },
-        { id: "splattershot", name: "Splattershot", icon: "images/weapons/64px-S3_Badge_Splattershot_4.png" },
-        { id: "52_gal", name: ".52 Gal", icon: "images/weapons/64px-S3_Badge_.52_Gal_4.png" },
-        { id: "nzap_85", name: "N-ZAP '85", icon: "images/weapons/64px-S3_Badge_N-ZAP_'85_4.png" },
-        { id: "splattershot_pro", name: "Splattershot Pro", icon: "images/weapons/64px-S3_Badge_Splattershot_Pro_4.png" },
-        { id: "96_gal", name: ".96 Gal", icon: "images/weapons/64px-S3_Badge_.96_Gal_4.png" },
-        { id: "jet_squelcher", name: "Jet Squelcher", icon: "images/weapons/64px-S3_Badge_Jet_Squelcher_4.png" },
-        { id: "splattershot_nova", name: "Splattershot Nova", icon: "images/weapons/64px-S3_Badge_Splattershot_Nova_4.png" },
-        { id: "l3_nozzlenose", name: "L-3 Nozzlenose", icon: "images/weapons/64px-S3_Badge_L-3_Nozzlenose_4.png" },
-        { id: "h3_nozzlenose", name: "H-3 Nozzlenose", icon: "images/weapons/64px-S3_Badge_H-3_Nozzlenose_4.png" },
-        { id: "squeezer", name: "Squeezer", icon: "images/weapons/64px-S3_Badge_Squeezer_4.png" },
-        { id: "luna_blaster", name: "Luna Blaster", icon: "images/weapons/64px-S3_Badge_Luna_Blaster_4.png" },
-        { id: "blaster", name: "Blaster", icon: "images/weapons/64px-S3_Badge_Blaster_4.png" },
-        { id: "range_blaster", name: "Range Blaster", icon: "images/weapons/64px-S3_Badge_Range_Blaster_4.png" },
-        { id: "clash_blaster", name: "Clash Blaster", icon: "images/weapons/64px-S3_Badge_Clash_Blaster_4.png" },
-        { id: "rapid_blaster", name: "Rapid Blaster", icon: "images/weapons/64px-S3_Badge_Rapid_Blaster_4.png" },
-        { id: "rapid_blaster_pro", name: "Rapid Blaster Pro", icon: "images/weapons/64px-S3_Badge_Rapid_Blaster_Pro_4.png" },
-        { id: "sblast_92", name: "S-BLAST '92", icon: "images/weapons/64px-S3_Badge_S-BLAST_'92_4.png" },
-        { id: "carbon_roller", name: "Carbon Roller", icon: "images/weapons/64px-S3_Badge_Carbon_Roller_4.png" },
-        { id: "splat_roller", name: "Splat Roller", icon: "images/weapons/64px-S3_Badge_Splat_Roller_4.png" },
-        { id: "dynamo_roller", name: "Dynamo Roller", icon: "images/weapons/64px-S3_Badge_Dynamo_Roller_4.png" },
-        { id: "flingza_roller", name: "Flingza Roller", icon: "images/weapons/64px-S3_Badge_Flingza_Roller_4.png" },
-        { id: "big_swig_roller", name: "Big Swig Roller", icon: "images/weapons/64px-S3_Badge_Big_Swig_Roller_4.png" },
-        { id: "inkbrush", name: "Inkbrush", icon: "images/weapons/64px-S3_Badge_Inkbrush_4.png" },
-        { id: "octobrush", name: "Octobrush", icon: "images/weapons/64px-S3_Badge_Octobrush_4.png" },
-        { id: "painbrush", name: "Painbrush", icon: "images/weapons/64px-S3_Badge_Painbrush_4.png" },
-        { id: "classic_squiffer", name: "Classic Squiffer", icon: "images/weapons/64px-S3_Badge_Classic_Squiffer_4.png" },
-        { id: "splat_charger", name: "Splat Charger", icon: "images/weapons/64px-S3_Badge_Splat_Charger_4.png" },
-        { id: "eliter_4k", name: "E-liter 4K", icon: "images/weapons/64px-S3_Badge_E-liter_4K_4.png" },
-        { id: "bamboozler_14_mk_i", name: "Bamboozler 14 Mk I", icon: "images/weapons/64px-S3_Badge_Bamboozler_14_Mk_I_4.png" },
-        { id: "goo_tuber", name: "Goo Tuber", icon: "images/weapons/64px-S3_Badge_Goo_Tuber_4.png" },
-        { id: "snipewriter_5h", name: "Snipewriter 5H", icon: "images/weapons/64px-S3_Badge_Snipewriter_5H_4.png" },
-        { id: "slosher", name: "Slosher", icon: "images/weapons/64px-S3_Badge_Slosher_4.png" },
-        { id: "tri_slosher", name: "Tri-Slosher", icon: "images/weapons/64px-S3_Badge_Tri-Slosher_4.png" },
-        { id: "sloshing_machine", name: "Sloshing Machine", icon: "images/weapons/64px-S3_Badge_Sloshing_Machine_4.png" },
-        { id: "bloblobber", name: "Bloblobber", icon: "images/weapons/64px-S3_Badge_Bloblobber_4.png" },
-        { id: "explosher", name: "Explosher", icon: "images/weapons/64px-S3_Badge_Explosher_4.png" },
-        { id: "dread_wringer", name: "Dread Wringer", icon: "images/weapons/64px-S3_Badge_Dread_Wringer_4.png" },
-        { id: "mini_splatling", name: "Mini Splatling", icon: "images/weapons/64px-S3_Badge_Mini_Splatling_4.png" },
-        { id: "heavy_splatling", name: "Heavy Splatling", icon: "images/weapons/64px-S3_Badge_Heavy_Splatling_4.png" },
-        { id: "hydra_splatling", name: "Hydra Splatling", icon: "images/weapons/64px-S3_Badge_Hydra_Splatling_4.png" },
-        { id: "ballpoint_splatling", name: "Ballpoint Splatling", icon: "images/weapons/64px-S3_Badge_Ballpoint_Splatling_4.png" },
-        { id: "nautilus_47", name: "Nautilus 47", icon: "images/weapons/64px-S3_Badge_Nautilus_47_4.png" },
-        { id: "heavy_edit_splatling", name: "Heavy Edit Splatling", icon: "images/weapons/64px-S3_Badge_Heavy_Edit_Splatling_4.png" },
-        { id: "dapple_dualies", name: "Dapple Dualies", icon: "images/weapons/64px-S3_Badge_Dapple_Dualies_4.png" },
-        { id: "splat_dualies", name: "Splat Dualies", icon: "images/weapons/64px-S3_Badge_Splat_Dualies_4.png" },
-        { id: "glooga_dualies", name: "Glooga Dualies", icon: "images/weapons/64px-S3_Badge_Glooga_Dualies_4.png" },
-        { id: "dualie_squelchers", name: "Dualie Squelchers", icon: "images/weapons/64px-S3_Badge_Dualie_Squelchers_4.png" },
-        { id: "dark_tetra_dualies", name: "Dark Tetra Dualies", icon: "images/weapons/64px-S3_Badge_Dark_Tetra_Dualies_4.png" },
-        { id: "douser_dualies_ff", name: "Douser Dualies FF", icon: "images/weapons/64px-S3_Badge_Douser_Dualies_FF_4.png" },
-        { id: "splat_brella", name: "Splat Brella", icon: "images/weapons/64px-S3_Badge_Splat_Brella_4.png" },
-        { id: "tenta_brella", name: "Tenta Brella", icon: "images/weapons/64px-S3_Badge_Tenta_Brella_4.png" },
-        { id: "undercover_brella", name: "Undercover Brella", icon: "images/weapons/64px-S3_Badge_Undercover_Brella_4.png" },
-        { id: "recycled_brella_24_mk_i", name: "Recycled Brella 24 Mk I", icon: "images/weapons/64px-S3_Badge_Recycled_Brella_24_Mk_I_4.png" },
-        { id: "tri_stringer", name: "Tri-Stringer", icon: "images/weapons/64px-S3_Badge_Tri-Stringer_4.png" },
-        { id: "reeflux_450", name: "REEF-LUX 450", icon: "images/weapons/64px-S3_Badge_REEF-LUX_450_4.png" },
-        { id: "wellstring_v", name: "Wellstring V", icon: "images/weapons/64px-S3_Badge_Wellstring_V_4.png" },
-        { id: "splatana_stamper", name: "Splatana Stamper", icon: "images/weapons/64px-S3_Badge_Splatana_Stamper_4.png" },
-        { id: "splatana_wiper", name: "Splatana Wiper", icon: "images/weapons/64px-S3_Badge_Splatana_Wiper_4.png" },
-        { id: "mint_decavitator", name: "Mint Decavitator", icon: "images/weapons/64px-S3_Badge_Mint_Decavitator_4.png" },
-        { id: "wildcard", name: "Wildcard", icon: "" },
-    ];
+async function loadGameDefinitions() {
+    try {
+        const response = await fetch('data/definitions.json');
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        gameDefinitions = await response.json();
+        console.log("Game definitions loaded:", gameDefinitions);
+    } catch (error) {
+        console.error("Could not load game definitions:", error);
+        throw error; // Re-throw to stop further execution if critical
+    }
+}
 
-    const defaultIcon = "images/placeholder.png";
-
+function initializeAppUI() {
     // --- DOM Elements ---
     const stageSelect = document.getElementById('stage-select');
     const stageIcon = document.getElementById('stage-icon');
@@ -88,7 +24,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- ONNX Model Variables ---
     let onnxSession = null;
     const onnxModelPath = 'data/model.onnx';
-    
+
+    // --- Other local variables ---
+    const defaultIcon = "images/placeholder.png";
     let selectedWeapons = new Set();
 
 
@@ -110,7 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
     stageSelect.addEventListener('change', () => updateIcon(stageSelect, stageIcon));
 
     function populateStageDropdown() {
-        stages.forEach(stage => {
+        gameDefinitions.stages.forEach(stage => {
             const option = document.createElement('option');
             option.value = stage.id;
             option.textContent = stage.name;
@@ -141,8 +79,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function populateWeaponCheckboxes() {
         weaponCheckboxContainer.innerHTML = '';
-        weapons.forEach(weapon => {
-            if (weapon.id === 'wildcard') return; // Skip wildcard
+        gameDefinitions.weapons.forEach(weapon => {
+            if (weapon.id === 'wildcard') return;
             
             const weaponEl = document.createElement('div');
             weaponEl.classList.add('weapon-checkbox-item');
@@ -174,30 +112,26 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    function initializeSelectionsAndIcons() {
-        populateStageDropdown();
-        updateIcon(stageSelect, stageIcon);
-        populateWeaponCheckboxes();
-    }
-
-    initializeSelectionsAndIcons();
+    populateStageDropdown();
+    updateIcon(stageSelect, stageIcon);
+    populateWeaponCheckboxes();
 
     function convertSelectionsToFeatures(stageId, weaponIds) {
         const features = [];
-        const numExpectedFeatures = stages.length + weapons.length;
+        const numExpectedFeatures = 71; // Hard-coded based on training
 
         // One-hot encode stage
-        const stageIndex = stages.findIndex(s => s.id === stageId);
-        stages.forEach((stage, index) => {
+        const stageIndex = gameDefinitions.stages.findIndex(s => s.id === stageId);
+        gameDefinitions.stages.forEach((stage, index) => {
             features.push(index === stageIndex ? 1.0 : 0.0);
         });
 
         // Multi-hot encode weapons
         const weaponIndices = []
         weaponIds.forEach(weaponId => {
-            weaponIndices.push(weapons.findIndex(w => w.id === weaponId));
+            weaponIndices.push(gameDefinitions.weapons.findIndex(w => w.id === weaponId));
         })
-        weapons.forEach((weapon, index) => {
+        gameDefinitions.weapons.forEach((weapon, index) => {
             features.push(weaponIndices.includes(index) ? 1.0 : 0.0);
         })
 
@@ -294,4 +228,16 @@ document.addEventListener('DOMContentLoaded', () => {
     confirmButton.textContent = "Loading Model...";
 
     loadOnnxModel();
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+    try {
+        await loadGameDefinitions();
+        
+        initializeAppUI();
+        
+    } catch (error) {
+        console.error("Failed to initialize the application:", error);
+        document.body.innerHTML = '<p style="text-align:center; padding:20px;">Sorry, the application could not be started. Please try again later.</p>';
+    }
 });
