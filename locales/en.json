@@ -81,7 +81,7 @@
       "stageLabel": "Select Stage:",
       "select4WeaponsLabel": "Select 4 Weapons:",
       "maxWeaponsAlert": "You can only select up to 4 weapons. Please deselect one if you wish to choose another.",
-      "predictButton": "Predict Difficulty",
+      "predictButton": "Rate",
       "predictButtonLoading": "Loading Model...",
       "predictButtonFailure": "Model Load Failed",
       "predictedRatingTitle": "Predicted Rating",
