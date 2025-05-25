@@ -115,7 +115,7 @@ best_model = random_search.best_estimator_
 
 # Step 6a: Create checkpoint directory
 timestamp = datetime.now().isoformat().replace(':', '-')
-checkpoint_dir = BASE_DIR / "data" / timestamp;
+checkpoint_dir = BASE_DIR / "data/checkpoints" / timestamp;
 try:
 	os.mkdir(checkpoint_dir)
 	print(f"Directory '{checkpoint_dir}' created successfully.")

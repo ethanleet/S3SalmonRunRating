@@ -1,0 +1,13 @@
+--- Best Hyperparameters ---
+{'max_depth': 29, 'max_features': 0.5, 'min_samples_leaf': 3, 'min_samples_split': 10}
+
+--- Train Set Evaluation ---
+Mean Absolute Error (MAE): 0.5654
+Root Mean Squared Error (RMSE): 0.7068
+R-squared (R2 Score): 0.6226
+
+--- Test Set Evaluation ---
+Mean Absolute Error (MAE): 0.8424
+Root Mean Squared Error (RMSE): 1.0169
+R-squared (R2 Score): 0.3731
+
