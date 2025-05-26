@@ -5,6 +5,7 @@ let currentLanguage = 'en';
 const supportedLanguages = [
     { code: 'en', name: 'English' },
     { code: 'ja', name: '日本語' },
+    { code: 'zh', name: '中文' },
 ];
 
 async function loadGameDefinitions() {
