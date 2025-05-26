@@ -75,8 +75,8 @@
       "wildcard": "?"
     },
     "ui": {
-      "pageTitle": "斯普拉遁3 鲑鱼跑打工评价",
-      "headerTitle": "斯普拉遁3 鲑鱼跑打工评价 (Beta) 🦑",
+      "pageTitle": "斯普拉遁3 鲑鱼跑打工评分",
+      "headerTitle": "斯普拉遁3 鲑鱼跑打工评分 (Beta) 🦑",
       "selectStageWeaponsTitle": "本期打工的评价怎么样？",
       "stageLabel": "选择地图:",
       "select4WeaponsLabel": "选择四种武器:",
@@ -84,7 +84,7 @@
       "predictButton": "评价",
       "predictButtonLoading": "正在读取模型...",
       "predictButtonFailure": "模型读取失败",
-      "predictedRatingTitle": "预测评价",
+      "predictedRatingTitle": "预期评分",
       "modelNotLoadedError": "正在读取模型。请稍后再尝试。",
       "errorPreparingData": "Error preparing input data for the model.",
       "errorPredictionFailed": "Error: Prediction failed.",
